@@ -28,6 +28,9 @@ type ShutdownReply struct {
 	Ntasks int
 }
 
+type DoTaskReply struct {
+}
+
 // RegisterArgs is the argument passed when a worker registers with the master.
 type RegisterArgs struct {
 	Worker string
