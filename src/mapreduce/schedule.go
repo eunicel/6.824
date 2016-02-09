@@ -27,14 +27,16 @@ func (mr *Master) schedule(phase jobPhase) {
 	var done = make(chan int, ntasks)
 	for n := 0; n < ntasks; n++ {
 		go func(taskNum int) {
-			workerName := <-mr.registerChannel
-			taskArgs := DoTaskArgs{mr.jobName, mr.files[taskNum], phase, taskNum, nios}
-			var reply DoTaskReply
-			ok := call(workerName, "Worker.DoTask", taskArgs, &reply)
-			if ok {
-				done <- taskNum
-				mr.registerChannel <- workerName
-				return
+			for {
+				workerName := <-mr.registerChannel
+				taskArgs := DoTaskArgs{mr.jobName, mr.files[taskNum], phase, taskNum, nios}
+				var reply DoTaskReply
+				ok := call(workerName, "Worker.DoTask", taskArgs, &reply)
+				if ok {
+					done <- taskNum
+					mr.registerChannel <- workerName
+					return
+				}
 			}
 		}(n)
 	}
